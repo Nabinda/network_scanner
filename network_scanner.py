@@ -12,15 +12,16 @@ import argparse
 def get_arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument("-t", "--target", dest="target", help="Target IP/IP Range")
+    parser.add_argument("-i", "--interface", dest="interface", help="Select Your Interface")
     options = parser.parse_args()
     return options
 
 
-def scan(ip):
+def scan(ip, interface):
     arp_request = ARP(pdst=ip)
     broadcast = Ether(dst="ff:ff:ff:ff:ff:ff")
     arp_request_broadcast = broadcast/arp_request
-    answered_packets = scapy.srp(arp_request_broadcast, timeout=3, verbose=False)[0]
+    answered_packets = scapy.srp(arp_request_broadcast, iface=interface, timeout=3, verbose=False)[0]
     print(answered_packets)
     clients_list = []
     for element in answered_packets:
@@ -38,5 +39,5 @@ def print_result(results_list):
 
 
 options = get_arguments()
-scan_result = scan(options.target)
+scan_result = scan(options.target, options.interface)
 print_result(scan_result)
